@@ -1,3 +1,4 @@
+#Coleta de Informações do produto
 codigoProduto = str(input("Digite o código do produto:"))
 nomeProduto = str(input("Digite o nome do produto:"))
 descricaoProduto = str(input("Digite a descrição do produto: "))
@@ -7,8 +8,9 @@ custoFixo = float(input("Digite o custo fixo (%): "))
 impostos = float(input("Digite o valor dos impostos (%): "))
 comissaoVenda = float(input("Digite a comissão de venda (%): "))
 margemLucro = float(input("Digite a margem de lucro (%): "))
+#Cálculo do Preço de Venda
 precoVenda = custoProduto/(1-(custoFixo+comissaoVenda+impostos+margemLucro)/100)
-print(precoVenda)
+#Tela de apresentação dos resultados
 print("-----------------------------------------------------")
 print("{:35} Valor \t %".format("Descrição"))
 print("-----------------------------------------------------")
