@@ -1,26 +1,28 @@
 import oracledb
+senha = str(input("DIGITE A SENHA DO ADIMINISTRADOR DO BANCO: "))
 connection = oracledb.connect(
-    user = "",
-    password = '',
-    dsn = "BD-ACD/xe"
+    user = "BD15022426",
+    password = senha,
+    dsn = "172.16.12.14/xe"
 )
 print("Conectado")
 cursor = connection.cursor()
-cursor.execute("SELECT * FROM produtos_PI")
+cursor.execute("SELECT * FROM produtos_pi")
 produtos = cursor.fetchall()
 for produto in produtos:
     codigoProduto = produto[0]
     nomeProduto = produto[1]
     descricaoProduto = produto[2]
-    precoVenda = produto[3]
-    custoProduto = produto[4]
+    custoProduto = produto[3]
+    impostos = produto[4]
     custoFixo = produto[5]
-    impostos = produto[6]
-    comissaoVenda = produto[7]
-    margemLucro = produto[8]
+    comissaoVenda = produto[6]
+    margemLucro = produto[7]
     #Cálculo do Preço de Venda
     precoVenda = custoProduto/(1-(custoFixo+comissaoVenda+impostos+margemLucro)/100)
     #Tela de apresentação dos resultados
+    print("-----------------------------------------------------")
+    print(f"{codigoProduto:<10} {nomeProduto:<20} {descricaoProduto}")
     print("-----------------------------------------------------")
     print("{:35} Valor \t %".format("Descrição"))
     print("-----------------------------------------------------")
@@ -43,7 +45,7 @@ for produto in produtos:
         print("Equilíbrio")
     elif margemLucro < 0:
         print("Prejuízo")
-    print("-----------------------------------------------------")
+    print("-----------------------------------------------------\n\n\n")
 
 cursor.close()
 connection.close()
