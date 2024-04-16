@@ -1,7 +1,7 @@
 import oracledb
 connection = oracledb.connect(
-    user = "BD15022426",
-    password = 'Mhbva10',
+    user = "",
+    password = '',
     dsn = "BD-ACD/xe"
 )
 print("Conectado")
