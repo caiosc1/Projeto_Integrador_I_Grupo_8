@@ -17,9 +17,9 @@ for produto in produtos:
     impostos = produto[4]
     custoFixo = produto[5]
     comissaoVenda = produto[6]
-    margemLucro = produto[7]
+    rentabilidade = produto[7]
     #Cálculo do Preço de Venda
-    precoVenda = custoProduto/(1-(custoFixo+comissaoVenda+impostos+margemLucro)/100)
+    precoVenda = custoProduto/(1-(custoFixo+comissaoVenda+impostos  rentabilidade)/100)
     #Tela de apresentação dos resultados
     print("-----------------------------------------------------")
     print(f"{codigoProduto:<10} {nomeProduto:<20} {descricaoProduto}")
@@ -33,17 +33,17 @@ for produto in produtos:
     print("{:35} {:.2f} \t {:.0f}%".format("E. Comissão de Vendas", comissaoVenda/100 * precoVenda, comissaoVenda))
     print("{:35} {:.2f} \t {:.0f}%".format("F. Impostos", impostos/100 * precoVenda, impostos))
     print("{:35} {:.2f} \t {:.0f}%".format("G. Outros custos(D+E+F)", custoFixo/100 * precoVenda + comissaoVenda/100 * precoVenda + impostos/100 * precoVenda, custoFixo+comissaoVenda+impostos))
-    print("{:35} {:.2f} \t {:.0f}%".format("H. Rentabilidade", margemLucro/100 * precoVenda, margemLucro))
+    print("{:35} {:.2f} \t {:.0f}%".format("H. Rentabilidade",  rentabilidade/100 * precoVenda,    rentabilidade))
     print("-----------------------------------------------------")
-    if  margemLucro > 20:
+    if  rentabilidade > 20:
         print("Lucro: Alto")
-    elif margemLucro > 10:
+    elif    rentabilidade > 10:
         print("Lucro: Médio")
-    elif margemLucro > 0:
+    elif    rentabilidade > 0:
         print("Lucro: Baixo")
-    elif margemLucro == 0:
+    elif    rentabilidade == 0:
         print("Equilíbrio")
-    elif margemLucro < 0:
+    elif    rentabilidade < 0:
         print("Prejuízo")
     print("-----------------------------------------------------\n\n\n")
 
