@@ -8,8 +8,8 @@ connection = oracledb.connect(
 print("Conectado")
 cursor = connection.cursor()
 cursor.execute("SELECT * FROM produtos_pi")
-produtos = cursor.fetchall()
-for produto in produtos:
+#produtos = cursor.fetchall()
+for produto in cursor:
     codigoProduto = produto[0]
     nomeProduto = produto[1]
     descricaoProduto = produto[2]
@@ -19,10 +19,10 @@ for produto in produtos:
     comissaoVenda = produto[6]
     rentabilidade = produto[7]
     #Cálculo do Preço de Venda
-    precoVenda = custoProduto/(1-(custoFixo+comissaoVenda+impostos  rentabilidade)/100)
+    precoVenda = custoProduto/(1-(custoFixo+comissaoVenda+impostos+rentabilidade)/100)
     #Tela de apresentação dos resultados
     print("-----------------------------------------------------")
-    print(f"{codigoProduto:<10} {nomeProduto:<20} {descricaoProduto}")
+    print(f"Código: {codigoProduto:<10}{"Nome: "+nomeProduto:>34} \n\nDescrição: {descricaoProduto}")
     print("-----------------------------------------------------")
     print("{:35} Valor \t %".format("Descrição"))
     print("-----------------------------------------------------")
@@ -33,7 +33,7 @@ for produto in produtos:
     print("{:35} {:.2f} \t {:.0f}%".format("E. Comissão de Vendas", comissaoVenda/100 * precoVenda, comissaoVenda))
     print("{:35} {:.2f} \t {:.0f}%".format("F. Impostos", impostos/100 * precoVenda, impostos))
     print("{:35} {:.2f} \t {:.0f}%".format("G. Outros custos(D+E+F)", custoFixo/100 * precoVenda + comissaoVenda/100 * precoVenda + impostos/100 * precoVenda, custoFixo+comissaoVenda+impostos))
-    print("{:35} {:.2f} \t {:.0f}%".format("H. Rentabilidade",  rentabilidade/100 * precoVenda,    rentabilidade))
+    print("{:35} {:.2f} \t {:.0f}%".format("H. Rentabilidade",  rentabilidade/100 * precoVenda, rentabilidade))
     print("-----------------------------------------------------")
     if  rentabilidade > 20:
         print("Lucro: Alto")
