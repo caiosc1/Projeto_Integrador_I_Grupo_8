@@ -1,15 +1,18 @@
 import oracledb
-senha = str(input("DIGITE A SENHA DO ADIMINISTRADOR DO BANCO: "))
+import getpass
+senha = getpass.getpass("DIGITE A SENHA DO ADMIN DO BANCO DE DADOS: ")
 connection = oracledb.connect(
     user = "BD15022426",
     password = senha,
     dsn = "172.16.12.14/xe"
 )
-print("Conectado")
+print("\nC o n e c t a d o   a o   B a n c o    c o m    S u c e s s o\n")
+print("I m p o r t a n d o   D a d o s   d o s   P r o d u t o s . . .\n\n")
 cursor = connection.cursor()
 cursor.execute("SELECT * FROM produtos_pi")
 #produtos = cursor.fetchall()
-for produto in cursor:
+listaProdutos = cursor
+for produto in listaProdutos:
     codigoProduto = produto[0]
     nomeProduto = produto[1]
     descricaoProduto = produto[2]
