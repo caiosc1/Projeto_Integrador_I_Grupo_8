@@ -1,3 +1,9 @@
 CREATE TABLE produtos_pi(codigo_produto INTEGER PRIMARY KEY, nome VARCHAR2(30), descriçao VARCHAR2(60), 
 custo_produto NUMBER, impostos NUMBER, custo_fixo NUMBER, comissao_vendas NUMBER, rentabilidade NUMBER
 );
+
+
+insert into produtos_pi(codigo_produto, nome, descriçao, custo_produto, 
+custo_fixo, comissao_vendas, impostos, rentabilidade) values();
+
+update produtos_pi set a = b where a = b;

@@ -24,20 +24,20 @@ for produto in listaProdutos:
     #Cálculo do Preço de Venda
     precoVenda = custoProduto/(1-(custoFixo+comissaoVenda+impostos+rentabilidade)/100)
     #Tela de apresentação dos resultados
-    print("-----------------------------------------------------")
-    print(f"Código: {codigoProduto:<10}{"Nome: "+nomeProduto:>34} \n\nDescrição: {descricaoProduto}")
-    print("-----------------------------------------------------")
+    print("--------------------------------------------------------")
+    print(f"Código: {codigoProduto:<10}{"Nome: "+nomeProduto:>37} \n\nDescrição: {descricaoProduto}")
+    print("--------------------------------------------------------")
     print("{:35} Valor \t %".format("Descrição"))
-    print("-----------------------------------------------------")
+    print("--------------------------------------------------------")
     print("{:35} {:.2f} \t 100%".format("A. Preço de Venda", precoVenda))
-    print("{:35} {:.2f} \t {:.0f}%".format("B. Custo de Aquisição(Fornecedor)", custoProduto, custoProduto*100/precoVenda))
-    print("{:35} {:.2f} \t {:.0f}%".format("C. Receita Bruta (A-B)", (precoVenda-custoProduto), (precoVenda-custoProduto)*100/precoVenda))
-    print("{:35} {:.2f} \t {:.0f}%".format("D. Custo Fixo/Administrativo", custoFixo/100 * precoVenda, custoFixo))
-    print("{:35} {:.2f} \t {:.0f}%".format("E. Comissão de Vendas", comissaoVenda/100 * precoVenda, comissaoVenda))
-    print("{:35} {:.2f} \t {:.0f}%".format("F. Impostos", impostos/100 * precoVenda, impostos))
-    print("{:35} {:.2f} \t {:.0f}%".format("G. Outros custos(D+E+F)", custoFixo/100 * precoVenda + comissaoVenda/100 * precoVenda + impostos/100 * precoVenda, custoFixo+comissaoVenda+impostos))
-    print("{:35} {:.2f} \t {:.0f}%".format("H. Rentabilidade",  rentabilidade/100 * precoVenda, rentabilidade))
-    print("-----------------------------------------------------")
+    print("{:35} {:.2f} \t {:.2f}%".format("B. Custo de Aquisição(Fornecedor)", custoProduto, custoProduto*100/precoVenda))
+    print("{:35} {:.2f} \t {:.2f}%".format("C. Receita Bruta (A-B)", (precoVenda-custoProduto), (precoVenda-custoProduto)*100/precoVenda))
+    print("{:35} {:.2f} \t {:.2f}%".format("D. Custo Fixo/Administrativo", custoFixo/100 * precoVenda, custoFixo))
+    print("{:35} {:.2f} \t {:.2f}%".format("E. Comissão de Vendas", comissaoVenda/100 * precoVenda, comissaoVenda))
+    print("{:35} {:.2f} \t {:.2f}%".format("F. Impostos", impostos/100 * precoVenda, impostos))
+    print("{:35} {:.2f} \t {:.2f}%".format("G. Outros custos(D+E+F)", custoFixo/100 * precoVenda + comissaoVenda/100 * precoVenda + impostos/100 * precoVenda, custoFixo+comissaoVenda+impostos))
+    print("{:35} {:.2f} \t {:.2f}%".format("H. Rentabilidade",  rentabilidade/100 * precoVenda, rentabilidade))
+    print("--------------------------------------------------------")
     if  rentabilidade > 20:
         print("Lucro: Alto")
     elif    rentabilidade > 10:
@@ -48,7 +48,7 @@ for produto in listaProdutos:
         print("Equilíbrio")
     elif    rentabilidade < 0:
         print("Prejuízo")
-    print("-----------------------------------------------------\n\n\n")
+    print("--------------------------------------------------------\n\n\n")
 
 cursor.close()
 connection.close()
