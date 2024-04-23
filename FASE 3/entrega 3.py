@@ -76,7 +76,7 @@ while escolaMenu != 5:
         print(f"\n==========================================================================")
         print(f"||                 L I S T A G E M   D E  P R O D U T O S               ||")
         print(f"==========================================================================")
-        cursor.execute("SELECT * FROM produtos_pi")
+        cursor.execute("SELECT * FROM produtos_pi ORDER BY codigo_produto ASC")
         #produtos = cursor.fetchall()
         listaProdutos = cursor
         for produto in listaProdutos:
