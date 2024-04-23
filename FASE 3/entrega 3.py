@@ -25,22 +25,21 @@ while escolaMenu != 5:
         codigoProduto = int(input("Digite o código do produto: "))
         nomeProduto = str(input("Digite o nome do produto: "))
         descricaoProduto = str(input("Digite a descrição do produto: "))
-        custoProduto = int(input("Digite o custo do produto(%): "))
+        custoProduto = int(input("Digite o custo do produto(R$): "))
         impostos = int(input("Digite os impostos do produto(%): "))
         custoFixo = int(input("Digite o custo fixo do produto(%): "))
         comissaoVenda = int(input("Digite a comissão de venda do produto(%): "))
         rentabilidade = int(input("Digite a rentabilidade do produto(%): "))
         while (impostos+custoFixo+comissaoVenda+rentabilidade)>=100:
-            print("VALORES DO PRODUTO ULTRAPASSAM O LIMITE, POR FAVOR REINSIRA OS CAMPOS: ")
-            custoProduto = int(input("Digite o custo do produto(%): "))
+            print("\nVALORES DO PRODUTO ULTRAPASSAM O LIMITE, POR FAVOR REINSIRA OS CAMPOS: ")
             impostos = int(input("Digite os impostos do produto(%): "))
             custoFixo = int(input("Digite o custo fixo do produto(%): "))
             comissaoVenda = int(input("Digite a comissão de venda do produto(%): "))
             rentabilidade = int(input("Digite a rentabilidade do produto(%): "))
-        cursor.execute(f"INSERT INTO produtos_pi VALUES({codigoProduto}, {nomeProduto}, {descricaoProduto}, {custoProduto}, {custoFixo}, {comissaoVenda}, {impostos})")
+        cursor.execute(f"INSERT INTO produtos_pi VALUES({codigoProduto}, '{nomeProduto}', '{descricaoProduto}', {custoProduto}, {impostos}, {custoFixo}, {comissaoVenda}, {rentabilidade})")
         connection.commit()
         input("DADOS DO PRODUTO INSERIDOS COM SUCESSO, APERTE ENTER PARA VOLTAR AO MENU...")
-    if escolaMenu == 4:
+    elif escolaMenu == 4:
         cursor.execute("SELECT * FROM produtos_pi")
         #produtos = cursor.fetchall()
         listaProdutos = cursor
@@ -81,6 +80,7 @@ while escolaMenu != 5:
             elif    rentabilidade < 0:
                 print("Prejuízo")
             print("--------------------------------------------------------\n\n\n")
+        input("APERTE ENTER PARA CONTINUAR...")
     else:
         input("ESCOLHA INVALIDA, APERTE ENTER PARA CONTINUAR...")
     print(f"==========================================================================")
