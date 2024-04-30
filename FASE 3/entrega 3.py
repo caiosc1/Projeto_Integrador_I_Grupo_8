@@ -19,7 +19,7 @@ print(f"||                                                                      
 print(f"==========================================================================")
 print(f"|| 1. Inserir  |  2. Alterar  |  3. Excluir  |  4. Listar  |  5. Sair   ||")
 print(f"==========================================================================")
-escolaMenu = int(input("\n\nD I G I T E   A   O P Ç Ã O   D E S E J A D A(N Ú M E R O): "))
+escolaMenu = int(input("\n\nDIGITE A OPÇÃO DESEJADA(NÚMERO): "))
 while escolaMenu != 5:
     if escolaMenu == 1:
         print(f"\n==========================================================================")
@@ -28,17 +28,17 @@ while escolaMenu != 5:
         codigoProduto = int(input("Digite o código do produto: "))
         nomeProduto = str(input("Digite o nome do produto: "))
         descricaoProduto = str(input("Digite a descrição do produto: "))
-        custoProduto = int(input("Digite o custo do produto(R$): "))
-        impostos = int(input("Digite os impostos do produto(%): "))
-        custoFixo = int(input("Digite o custo fixo do produto(%): "))
-        comissaoVenda = int(input("Digite a comissão de venda do produto(%): "))
-        rentabilidade = int(input("Digite a rentabilidade do produto(%): "))
+        custoProduto = float(input("Digite o custo do produto(R$): "))
+        impostos = float(input("Digite os impostos do produto(%): "))
+        custoFixo = float(input("Digite o custo fixo do produto(%): "))
+        comissaoVenda = float(input("Digite a comissão de venda do produto(%): "))
+        rentabilidade = float(input("Digite a rentabilidade do produto(%): "))
         while (impostos+custoFixo+comissaoVenda+rentabilidade)>=100:
             print("\nVALORES DO PRODUTO ULTRAPASSAM O LIMITE, POR FAVOR REINSIRA OS CAMPOS: ")
-            impostos = int(input("Digite os impostos do produto(%): "))
-            custoFixo = int(input("Digite o custo fixo do produto(%): "))
-            comissaoVenda = int(input("Digite a comissão de venda do produto(%): "))
-            rentabilidade = int(input("Digite a rentabilidade do produto(%): "))
+            impostos = float(input("Digite os impostos do produto(%): "))
+            custoFixo = float(input("Digite o custo fixo do produto(%): "))
+            comissaoVenda = float(input("Digite a comissão de venda do produto(%): "))
+            rentabilidade = float(input("Digite a rentabilidade do produto(%): "))
         cursor.execute(f"INSERT INTO produtos_pi VALUES({codigoProduto}, '{nomeProduto}', '{descricaoProduto}', {custoProduto}, {impostos}, {custoFixo}, {comissaoVenda}, {rentabilidade})")
         connection.commit()
         input("DADOS DO PRODUTO INSERIDOS COM SUCESSO, APERTE ENTER PARA VOLTAR AO MENU...")
@@ -46,40 +46,89 @@ while escolaMenu != 5:
         print(f"\n==========================================================================")
         print(f"||                A L T E R A Ç Ã O   D E   D A D O S                   ||")
         print(f"==========================================================================")
+        listaMudancas = {1:"nome" ,2: "descriçao",3: "custo_produto", 4: "comissao_vendas",5: "impostos",6: "rentabilidade"}
+        valsstring = [1, 2]
         codigoProduto = int(input("\nDIGITE O CÓDIGO DO PRODUTO QUE DESEJA ALTERAR: "))
-        print("\nDIGITE AS NOVAS INFORMAÇÕES DO PRODUTO:")
-        nomeProduto = str(input("Digite o nome do produto: "))
-        descricaoProduto = str(input("Digite a descrição do produto: "))
-        custoProduto = int(input("Digite o custo do produto(R$): "))
-        impostos = int(input("Digite os impostos do produto(%): "))
-        custoFixo = int(input("Digite o custo fixo do produto(%): "))
-        comissaoVenda = int(input("Digite a comissão de venda do produto(%): "))
-        rentabilidade = int(input("Digite a rentabilidade do produto(%): "))
-        while (impostos+custoFixo+comissaoVenda+rentabilidade)>=100:
-            print("\nVALORES DO PRODUTO ULTRAPASSAM O LIMITE, POR FAVOR REINSIRA OS CAMPOS: ")
-            impostos = int(input("Digite os impostos do produto(%): "))
-            custoFixo = int(input("Digite o custo fixo do produto(%): "))
-            comissaoVenda = int(input("Digite a comissão de venda do produto(%): "))
-            rentabilidade = int(input("Digite a rentabilidade do produto(%): "))
-        cursor.execute(f"UPDATE produtos_pi SET nome = '{nomeProduto}', descriçao = '{descricaoProduto}', custo_produto = {custoProduto}, impostos = {impostos}, custo_fixo = {custoFixo}, comissao_vendas = {comissaoVenda}, rentabilidade = {rentabilidade} WHERE codigo_produto = {codigoProduto}")
-        connection.commit()
-        input("\nDADOS ALTERADOS COM SUCESSO, APERTE ENTER PARA CONTINUAR...")
+        cursor.execute("SELECT * FROM produtos_pi WHERE ")
+        produto_excluido = cursor
+        for produto in produto_excluido:
+            codigoProduto = produto[0]
+            nomeProduto = produto[1]
+            descricaoProduto = produto[2]
+            custoProduto = produto[3]
+            impostos = produto[4]
+            custoFixo = produto[5]
+            comissaoVenda = produto[6]
+            rentabilidade = produto[7]
+            #Tela de apresentação dos resultados
+            print("--------------------------------------------------------")
+            print(f"\t1. Nome: {nomeProduto}")
+            print(f"\t2. Descrição: {descricaoProduto}")
+            print(f"\t3. Custo Fixo/Administrativo: {custoFixo}")
+            print(f"\t4. Comissão de Vendas: {comissaoVenda}")
+            print(f"\t5. Impostos: {impostos}")
+            print(f"\t6. Rentabilidade: {rentabilidade}")
+            print("--------------------------------------------------------")
+        escolhaAlteracao = int(input("DIGITE O NÚMERO DO CAMPO QUE DESEJA ALTERAR: "))
+        if escolhaAlteracao in valsstring:
+            alteracao = str(input("DIGITE O NOVO VALOR DO CAMPO ESCOLHIDO"))
+            cursor.execute(f"UPDATE produtos_pi set {listaMudancas[escolhaAlteracao]} = '{alteracao}' WHERE codigo_produto = {codigoProduto}")
+            connection.commit()
+        else:
+            alteracao = float(input("DIGITE O NOVO VALOR DO CAMPO ESCOLHIDO: "))
+            while (impostos+custoFixo+comissaoVenda+rentabilidade)>=100:
+                print("\nVALORES DO PRODUTO ULTRAPASSAM O LIMITE, POR FAVOR REINSIRA O CAMPO: ")
+                alteracao = float(input("DIGITE O NOVO VALOR DO CAMPO ESCOLHIDO: "))
+            cursor.execute(f"UPDATE produtos_pi set {listaMudancas[escolhaAlteracao]} = {alteracao} WHERE codigo_produto = {codigoProduto}")
+            connection.commit()
     elif escolaMenu == 3:
         print(f"\n==========================================================================")
         print(f"||                   E X C L U S Ã O   D E   D A D O S                  ||")
         print(f"==========================================================================")
         codigoProduto = int(input("\nDIGITE O CÓDIGO DO PRODUTO QUE DESEJA EXCLUIR: "))
-        cursor.execute(f"DELETE produtos_pi WHERE codigo_produto = {codigoProduto}")
-        connection.commit()
-        input("PRODUTO EXCLUIDO COM SUCESSO, APERTE ENTER PARA CONTINUAR...")
+        cursor.execute(f"SELECT * FROM produtos_pi WHERE codigo_produto = {codigoProduto}")
+        produto_excluido = cursor
+        for produto in produto_excluido:
+            codigoProduto = produto[0]
+            nomeProduto = produto[1]
+            descricaoProduto = produto[2]
+            custoProduto = produto[3]
+            impostos = produto[4]
+            custoFixo = produto[5]
+            comissaoVenda = produto[6]
+            rentabilidade = produto[7]
+            #Cálculo do Preço de Venda
+            precoVenda = custoProduto/(1-(custoFixo+comissaoVenda+impostos+rentabilidade)/100)
+            #Tela de apresentação dos resultados
+            print("--------------------------------------------------------")
+            print(f"Código: {codigoProduto:<10}{"Nome: "+nomeProduto:>37} \n\nDescrição: {descricaoProduto}")
+            print("--------------------------------------------------------")
+            print("{:35} Valor \t %".format("Descrição"))
+            print("--------------------------------------------------------")
+            print("{:35} {:.2f} \t 100%".format("A. Preço de Venda", precoVenda))
+            print("{:35} {:.2f} \t {:.2f}%".format("B. Custo de Aquisição(Fornecedor)", custoProduto, custoProduto*100/precoVenda))
+            print("{:35} {:.2f} \t {:.2f}%".format("C. Receita Bruta (A-B)", (precoVenda-custoProduto), (precoVenda-custoProduto)*100/precoVenda))
+            print("{:35} {:.2f} \t {:.2f}%".format("D. Custo Fixo/Administrativo", custoFixo/100 * precoVenda, custoFixo))
+            print("{:35} {:.2f} \t {:.2f}%".format("E. Comissão de Vendas", comissaoVenda/100 * precoVenda, comissaoVenda))
+            print("{:35} {:.2f} \t {:.2f}%".format("F. Impostos", impostos/100 * precoVenda, impostos))
+            print("{:35} {:.2f} \t {:.2f}%".format("G. Outros custos(D+E+F)", custoFixo/100 * precoVenda + comissaoVenda/100 * precoVenda + impostos/100 * precoVenda, custoFixo+comissaoVenda+impostos))
+            print("{:35} {:.2f} \t {:.2f}%".format("H. Rentabilidade",  rentabilidade/100 * precoVenda, rentabilidade))
+            print("--------------------------------------------------------")
+        escolha_exclusao = str(input("DESEJA REALMENTE EXCLUIR O PRODUTO(S/N): "))
+        if escolha_exclusao.upper() == "S":
+            cursor.execute(f"DELETE produtos_pi WHERE codigo_produto = {codigoProduto}")
+            connection.commit()
+            input("PRODUTO EXCLUIDO COM SUCESSO, APERTE ENTER PARA CONTINUAR...")
+        else: 
+            input("EXCLUSÃO CANCELADA, APERTE ENTER PARA CONTINUAR...")
     elif escolaMenu == 4:
         print(f"\n==========================================================================")
         print(f"||                 L I S T A G E M   D E  P R O D U T O S               ||")
         print(f"==========================================================================")
         cursor.execute("SELECT * FROM produtos_pi ORDER BY codigo_produto ASC")
         #produtos = cursor.fetchall()
-        listaProdutos = cursor
-        for produto in listaProdutos:
+        produto_excluido = cursor
+        for produto in  produto_excluido:
             codigoProduto = produto[0]
             nomeProduto = produto[1]
             descricaoProduto = produto[2]
