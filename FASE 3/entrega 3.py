@@ -46,41 +46,39 @@ while escolaMenu != 5:
         print(f"\n==========================================================================")
         print(f"||                A L T E R A Ç Ã O   D E   D A D O S                   ||")
         print(f"==========================================================================")
-        listaMudancas = {1:"nome" ,2: "descriçao",3: "custo_produto", 4: "comissao_vendas",5: "impostos",6: "rentabilidade"}
+        listaMudancas = {1:"nome" ,2: "descriçao",3: "custo_produto", 4: "custo_fixo",5: "comissao_vendas",6: "impostos",7: "rentabilidade"}
         valsstring = [1, 2]
         codigoProduto = int(input("\nDIGITE O CÓDIGO DO PRODUTO QUE DESEJA ALTERAR: "))
-        cursor.execute("SELECT * FROM produtos_pi WHERE ")
+        cursor.execute(f"SELECT * FROM produtos_pi WHERE codigo_produto = {codigoProduto}")
         produto_excluido = cursor
         for produto in produto_excluido:
-            codigoProduto = produto[0]
-            nomeProduto = produto[1]
-            descricaoProduto = produto[2]
-            custoProduto = produto[3]
-            impostos = produto[4]
-            custoFixo = produto[5]
-            comissaoVenda = produto[6]
-            rentabilidade = produto[7]
+            #             Nome, descrição, custo,custo fixo, comissão, impostos, rentabilidade
+            infProd = [produto[1],produto[2],produto[3],produto[5],produto[6],produto[4],produto[7]]
             #Tela de apresentação dos resultados
             print("--------------------------------------------------------")
-            print(f"\t1. Nome: {nomeProduto}")
-            print(f"\t2. Descrição: {descricaoProduto}")
-            print(f"\t3. Custo Fixo/Administrativo: {custoFixo}")
-            print(f"\t4. Comissão de Vendas: {comissaoVenda}")
-            print(f"\t5. Impostos: {impostos}")
-            print(f"\t6. Rentabilidade: {rentabilidade}")
+            print(f"\t1. Nome: {produto[1]}")
+            print(f"\t2. Descrição: {produto[2]}")
+            print(f"\t3. Custo de Aquisição: {produto[2]}")
+            print(f"\t4. Custo Fixo/Administrativo: {produto[5]}")
+            print(f"\t5. Comissão de Vendas: {produto[6]}")
+            print(f"\t6. Impostos: {produto[4]}")
+            print(f"\t7. Rentabilidade: {produto[7]}")
             print("--------------------------------------------------------")
         escolhaAlteracao = int(input("DIGITE O NÚMERO DO CAMPO QUE DESEJA ALTERAR: "))
         if escolhaAlteracao in valsstring:
-            alteracao = str(input("DIGITE O NOVO VALOR DO CAMPO ESCOLHIDO"))
+            alteracao = str(input("DIGITE O NOVO VALOR DO CAMPO ESCOLHIDO: "))
             cursor.execute(f"UPDATE produtos_pi set {listaMudancas[escolhaAlteracao]} = '{alteracao}' WHERE codigo_produto = {codigoProduto}")
             connection.commit()
         else:
             alteracao = float(input("DIGITE O NOVO VALOR DO CAMPO ESCOLHIDO: "))
-            while (impostos+custoFixo+comissaoVenda+rentabilidade)>=100:
+            infProd[escolhaAlteracao-1] = alteracao
+            while (infProd[3]+infProd[4]+infProd[5]+infProd[6])>=100:
                 print("\nVALORES DO PRODUTO ULTRAPASSAM O LIMITE, POR FAVOR REINSIRA O CAMPO: ")
                 alteracao = float(input("DIGITE O NOVO VALOR DO CAMPO ESCOLHIDO: "))
+                infProd[escolhaAlteracao-1] = alteracao
             cursor.execute(f"UPDATE produtos_pi set {listaMudancas[escolhaAlteracao]} = {alteracao} WHERE codigo_produto = {codigoProduto}")
             connection.commit()
+        input("PRODUTO ALTERADO COM SUCESSO, APERTE ENTER PARA CONTINUAR...")
     elif escolaMenu == 3:
         print(f"\n==========================================================================")
         print(f"||                   E X C L U S Ã O   D E   D A D O S                  ||")
@@ -179,7 +177,7 @@ while escolaMenu != 5:
     print(f"==========================================================================")
     print(f"|| 1. Inserir  |  2. Alterar  |  3. Excluir  |  4. Listar  |  5. Sair   ||")
     print(f"==========================================================================")
-    escolaMenu = int(input("\n\nD I G I T E   A   O P Ç Ã O   D E S E J A D A(N Ú M E R O): "))
+    escolaMenu = int(input("\n\nDIGITE A OPÇÃO DESEJADA(NÚMERO): "))
 
 cursor.close()
 connection.close()
