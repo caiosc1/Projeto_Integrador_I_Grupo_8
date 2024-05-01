@@ -58,7 +58,7 @@ while escolaMenu != 5:
             print("--------------------------------------------------------")
             print(f"\t1. Nome: {produto[1]}")
             print(f"\t2. Descrição: {produto[2]}")
-            print(f"\t3. Custo de Aquisição: {produto[2]}")
+            print(f"\t3. Custo de Aquisição: {produto[3]}")
             print(f"\t4. Custo Fixo/Administrativo: {produto[5]}")
             print(f"\t5. Comissão de Vendas: {produto[6]}")
             print(f"\t6. Impostos: {produto[4]}")
