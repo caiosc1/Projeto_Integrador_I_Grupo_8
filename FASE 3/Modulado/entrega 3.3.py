@@ -41,18 +41,18 @@ def menu_insercao():
     codigoProduto = validacao_codigo()
     nomeProduto = str(input("Digite o nome do produto: "))
     descricaoProduto = validacao_descricao(str(input("Digite a descrição do produto: ")))
-    custoProduto = float(input("Digite o custo do produto(R$): "))
-    impostos = float(input("Digite os impostos do produto(%): "))
-    custoFixo = float(input("Digite o custo fixo do produto(%): "))
-    comissaoVenda = float(input("Digite a comissão de venda do produto(%): "))
-    rentabilidade = float(input("Digite a rentabilidade do produto(%): "))
+    custoProduto = validacao_numeros(str(input("Digite o custo do produto(R$): ")))
+    impostos = validacao_numeros(str(input("Digite os impostos do produto(%): ")))
+    custoFixo = validacao_numeros(str(input("Digite o custo fixo do produto(%): ")))
+    comissaoVenda = validacao_numeros(str(input("Digite a comissão de venda do produto(%): ")))
+    rentabilidade = validacao_numeros(str(input("Digite a rentabilidade do produto(%): ")))
 
     while (impostos+custoFixo+comissaoVenda+rentabilidade)>=100:
         print("\nVALORES DO PRODUTO ULTRAPASSAM O LIMITE, POR FAVOR REINSIRA OS CAMPOS: ")
-        impostos = float(input("Digite os impostos do produto(%): "))
-        custoFixo = float(input("Digite o custo fixo do produto(%): "))
-        comissaoVenda = float(input("Digite a comissão de venda do produto(%): "))
-        rentabilidade = float(input("Digite a rentabilidade do produto(%): "))
+        impostos = validacao_numeros(str(input("Digite os impostos do produto(%): ")))
+        custoFixo = validacao_numeros(str(input("Digite o custo fixo do produto(%): ")))
+        comissaoVenda = validacao_numeros(str(input("Digite a comissão de venda do produto(%): ")))
+        rentabilidade = validacao_numeros(str(input("Digite a rentabilidade do produto(%): ")))
     
     descricaoProduto = criptografar(descricaoProduto)
     cursor.execute(f"INSERT INTO produtos_pi VALUES({codigoProduto}, '{nomeProduto}', '{descricaoProduto}', {custoProduto}, {impostos}, {custoFixo}, {comissaoVenda}, {rentabilidade})")
@@ -96,12 +96,12 @@ def menu_alteracao():
         cursor.execute(f"UPDATE produtos_pi set {listaMudancas[escolhaAlteracao]} = '{alteracao}' WHERE codigo_produto = {codigoProduto}")
 
     else:
-        alteracao = float(input("DIGITE O NOVO VALOR DO CAMPO ESCOLHIDO: "))
+        alteracao = validacao_numeros(str(input("DIGITE O NOVO VALOR DO CAMPO ESCOLHIDO: ")))
         infProd[escolhaAlteracao-1] = alteracao
 
         while (infProd[3]+infProd[4]+infProd[5]+infProd[6])>=100:
             print("\nVALORES DO PRODUTO ULTRAPASSAM O LIMITE, POR FAVOR REINSIRA O CAMPO: ")
-            alteracao = float(input("DIGITE O NOVO VALOR DO CAMPO ESCOLHIDO: "))
+            alteracao = validacao_numeros(str(input("DIGITE O NOVO VALOR DO CAMPO ESCOLHIDO: ")))
             infProd[escolhaAlteracao-1] = alteracao
 
         cursor.execute(f"UPDATE produtos_pi set {listaMudancas[escolhaAlteracao]} = {alteracao} WHERE codigo_produto = {codigoProduto}")
@@ -339,6 +339,23 @@ def validacao_descricao(descricao: str):
             nova_descricao = str(input("Digite a descrição do produto: "))
             return validacao_descricao(nova_descricao)
     return descricao
+
+def validacao_numeros(numero: str):
+    validos = [".", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0",]
+    fator_multiplicativo = 1
+    if numero[0] == "-":
+        fator_multiplicativo = -1
+        numero = numero[1:]
+    if numero.count(".") > 1:
+        print("DADOS DIGITADOS INVALIDOS")
+        novo_valor = str(input("Digite o valor novamente: "))
+        return validacao_numeros(novo_valor)
+    for algaritimo in numero:
+        if algaritimo not in validos:
+            print("DADOS DIGITADOS INVALIDOS")
+            novo_valor = str(input("Digite o valor novamente: "))
+            return validacao_numeros(novo_valor)
+    return float(numero)*fator_multiplicativo
 
 main()
 cursor.close()
