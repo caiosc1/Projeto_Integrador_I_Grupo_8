@@ -86,7 +86,12 @@ def menu_alteracao():
         print(f"\t7. Rentabilidade: {produto[7]}")
         print("--------------------------------------------------------")
 
-    escolhaAlteracao = int(input("DIGITE O NÚMERO DO CAMPO QUE DESEJA ALTERAR: "))
+    escolhaAlteracao = str(input("DIGITE O NÚMERO DO CAMPO QUE DESEJA ALTERAR: "))
+    escolhas_validas = ["1", "2", "3", "4", "5", "6"]
+    while not escolhaAlteracao in escolhas_validas or not escolhaAlteracao.isdigit():
+        print("ESCOLHA INVALIDA!")
+        escolhaAlteracao = str(input("DIGITE O NÚMERO DO CAMPO QUE DESEJA ALTERAR: "))
+    escolhaAlteracao = int(escolhaAlteracao)
 
     if escolhaAlteracao in valsstring:
         alteracao = str(input("DIGITE O NOVO VALOR DO CAMPO ESCOLHIDO: "))
