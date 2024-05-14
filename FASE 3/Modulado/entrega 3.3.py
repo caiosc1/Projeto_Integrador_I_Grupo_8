@@ -41,17 +41,17 @@ def menu_insercao():
     codigoProduto = validacao_codigo()
     nomeProduto = str(input("Digite o nome do produto: "))
     descricaoProduto = validacao_descricao(str(input("Digite a descrição do produto: ")))
-    custoProduto = validacao_numeros(str(input("Digite o custo do produto(R$): ")))
-    impostos = validacao_numeros(str(input("Digite os impostos do produto(%): ")))
-    custoFixo = validacao_numeros(str(input("Digite o custo fixo do produto(%): ")))
-    comissaoVenda = validacao_numeros(str(input("Digite a comissão de venda do produto(%): ")))
+    custoProduto = nonnegative_validacao_numeros(str(input("Digite o custo do produto(R$): ")))
+    impostos = nonnegative_validacao_numeros(str(input("Digite os impostos do produto(%): ")))
+    custoFixo = nonnegative_validacao_numeros(str(input("Digite o custo fixo do produto(%): ")))
+    comissaoVenda = nonnegative_validacao_numeros(str(input("Digite a comissão de venda do produto(%): ")))
     rentabilidade = validacao_numeros(str(input("Digite a rentabilidade do produto(%): ")))
 
     while (impostos+custoFixo+comissaoVenda+rentabilidade)>=100:
         print("\nVALORES DO PRODUTO ULTRAPASSAM O LIMITE, POR FAVOR REINSIRA OS CAMPOS: ")
-        impostos = validacao_numeros(str(input("Digite os impostos do produto(%): ")))
-        custoFixo = validacao_numeros(str(input("Digite o custo fixo do produto(%): ")))
-        comissaoVenda = validacao_numeros(str(input("Digite a comissão de venda do produto(%): ")))
+        impostos = nonnegative_validacao_numeros(str(input("Digite os impostos do produto(%): ")))
+        custoFixo = nonnegative_validacao_numeros(str(input("Digite o custo fixo do produto(%): ")))
+        comissaoVenda = nonnegative_validacao_numeros(str(input("Digite a comissão de venda do produto(%): ")))
         rentabilidade = validacao_numeros(str(input("Digite a rentabilidade do produto(%): ")))
     
     descricaoProduto = criptografar(descricaoProduto)
@@ -100,13 +100,24 @@ def menu_alteracao():
             alteracao = criptografar(alteracao)
         cursor.execute(f"UPDATE produtos_pi set {listaMudancas[escolhaAlteracao]} = '{alteracao}' WHERE codigo_produto = {codigoProduto}")
 
+        if escolhaAlteracao == 7:
+            alteracao = validacao_numeros(str(input("DIGITE O NOVO VALOR DO CAMPO ESCOLHIDO: ")))
+            infProd[escolhaAlteracao-1] = alteracao
+
+            while (infProd[3]+infProd[4]+infProd[5]+infProd[6])>=100:
+                print("\nVALORES DO PRODUTO ULTRAPASSAM O LIMITE, POR FAVOR REINSIRA O CAMPO: ")
+                alteracao = validacao_numeros(str(input("DIGITE O NOVO VALOR DO CAMPO ESCOLHIDO: ")))
+                infProd[escolhaAlteracao-1] = alteracao
+
+        cursor.execute(f"UPDATE produtos_pi set {listaMudancas[escolhaAlteracao]} = {alteracao} WHERE codigo_produto = {codigoProduto}")
+
     else:
-        alteracao = validacao_numeros(str(input("DIGITE O NOVO VALOR DO CAMPO ESCOLHIDO: ")))
+        alteracao = nonnegative_validacao_numeros(str(input("DIGITE O NOVO VALOR DO CAMPO ESCOLHIDO: ")))
         infProd[escolhaAlteracao-1] = alteracao
 
         while (infProd[3]+infProd[4]+infProd[5]+infProd[6])>=100:
             print("\nVALORES DO PRODUTO ULTRAPASSAM O LIMITE, POR FAVOR REINSIRA O CAMPO: ")
-            alteracao = validacao_numeros(str(input("DIGITE O NOVO VALOR DO CAMPO ESCOLHIDO: ")))
+            alteracao = nonnegative_validacao_numeros(str(input("DIGITE O NOVO VALOR DO CAMPO ESCOLHIDO: ")))
             infProd[escolhaAlteracao-1] = alteracao
 
         cursor.execute(f"UPDATE produtos_pi set {listaMudancas[escolhaAlteracao]} = {alteracao} WHERE codigo_produto = {codigoProduto}")
@@ -255,28 +266,6 @@ def descriptografar(descricao_criptografada):
     
     return descricao_letras_descriptografado
 
-def main():
-    escolha = menu()
-
-    while escolha != "5":
-        if escolha == "1":
-            menu_insercao()
-
-        elif escolha == "2":
-            menu_alteracao()
-
-        elif escolha == "3":
-            menu_exclusao()
-
-        elif escolha == "4":
-            listagem()
-        else:
-            input("ESCOLHA INVALIDA, APERTE ENTER PARA CONTINUAR...")
-
-        escolha = menu()
-    
-    print("SAINDO DO PROGRAMA...")
-
 def validacao_codigo():
     codigoProduto = int(input("Digite o código do produto: "))
     cursor.execute("SELECT codigo_produto from produtos_pi")
@@ -361,6 +350,41 @@ def validacao_numeros(numero: str):
             novo_valor = str(input("Digite o valor novamente: "))
             return validacao_numeros(novo_valor)
     return float(numero)*fator_multiplicativo
+
+def nonnegative_validacao_numeros(numero: str):
+    validos = [".", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0",]
+    if numero.count(".") > 1:
+        print("DADOS DIGITADOS INVALIDOS")
+        novo_valor = str(input("Digite o valor novamente: "))
+        return nonnegative_validacao_numeros(novo_valor)
+    for algaritimo in numero:
+        if algaritimo not in validos:
+            print("DADOS DIGITADOS INVALIDOS")
+            novo_valor = str(input("Digite o valor novamente: "))
+            return nonnegative_validacao_numeros(novo_valor)
+    return float(numero)
+
+def main():
+    escolha = menu()
+
+    while escolha != "5":
+        if escolha == "1":
+            menu_insercao()
+
+        elif escolha == "2":
+            menu_alteracao()
+
+        elif escolha == "3":
+            menu_exclusao()
+
+        elif escolha == "4":
+            listagem()
+        else:
+            input("ESCOLHA INVALIDA, APERTE ENTER PARA CONTINUAR...")
+
+        escolha = menu()
+    
+    print("SAINDO DO PROGRAMA...")
 
 main()
 cursor.close()
