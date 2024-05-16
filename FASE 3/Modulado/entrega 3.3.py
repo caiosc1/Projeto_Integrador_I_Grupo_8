@@ -39,7 +39,7 @@ def menu_insercao():
     print(f"==========================================================================")
 
     codigoProduto = validacao_codigo()
-    nomeProduto = str(input("Digite o nome do produto: "))
+    nomeProduto = validacao_nao_nulo(str(input("Digite o nome do produto: ")))
     descricaoProduto = validacao_descricao(str(input("Digite a descrição do produto: ")))
     custoProduto = nonnegative_validacao_numeros(str(input("Digite o custo do produto(R$): ")))
     impostos = nonnegative_validacao_numeros(str(input("Digite os impostos do produto(%): ")))
@@ -67,7 +67,7 @@ def menu_alteracao():
     print(f"==========================================================================")
 
     listaMudancas = {1:"nome" ,2: "descriçao",3: "custo_produto", 4: "custo_fixo",5: "comissao_vendas",6: "impostos",7: "rentabilidade"}
-    valsstring = [1, 2]
+    valsstring = [1, 2, 7]
     codigoProduto = existencia_codigo()
     cursor.execute(f"SELECT * FROM produtos_pi WHERE codigo_produto = {codigoProduto}")
     produto_excluido = cursor
@@ -87,21 +87,21 @@ def menu_alteracao():
         print("--------------------------------------------------------")
 
     escolhaAlteracao = str(input("DIGITE O NÚMERO DO CAMPO QUE DESEJA ALTERAR: "))
-    escolhas_validas = ["1", "2", "3", "4", "5", "6"]
+    escolhas_validas = ["1", "2", "3", "4", "5", "6", "7"]
     while not escolhaAlteracao in escolhas_validas or not escolhaAlteracao.isdigit():
         print("ESCOLHA INVALIDA!")
         escolhaAlteracao = str(input("DIGITE O NÚMERO DO CAMPO QUE DESEJA ALTERAR: "))
     escolhaAlteracao = int(escolhaAlteracao)
 
     if escolhaAlteracao in valsstring:
-        alteracao = str(input("DIGITE O NOVO VALOR DO CAMPO ESCOLHIDO: "))
+        alteracao = validacao_nao_nulo(str(input("DIGITE O NOVO VALOR DO CAMPO ESCOLHIDO: ")))
         if escolhaAlteracao == 2:
             alteracao = validacao_descricao(alteracao)
             alteracao = criptografar(alteracao)
-        cursor.execute(f"UPDATE produtos_pi set {listaMudancas[escolhaAlteracao]} = '{alteracao}' WHERE codigo_produto = {codigoProduto}")
+            cursor.execute(f"UPDATE produtos_pi set {listaMudancas[escolhaAlteracao]} = '{alteracao}' WHERE codigo_produto = {codigoProduto}")
 
         if escolhaAlteracao == 7:
-            alteracao = validacao_numeros(str(input("DIGITE O NOVO VALOR DO CAMPO ESCOLHIDO: ")))
+            alteracao = validacao_numeros(alteracao)
             infProd[escolhaAlteracao-1] = alteracao
 
             while (infProd[3]+infProd[4]+infProd[5]+infProd[6])>=100:
@@ -109,7 +109,7 @@ def menu_alteracao():
                 alteracao = validacao_numeros(str(input("DIGITE O NOVO VALOR DO CAMPO ESCOLHIDO: ")))
                 infProd[escolhaAlteracao-1] = alteracao
 
-        cursor.execute(f"UPDATE produtos_pi set {listaMudancas[escolhaAlteracao]} = {alteracao} WHERE codigo_produto = {codigoProduto}")
+            cursor.execute(f"UPDATE produtos_pi set {listaMudancas[escolhaAlteracao]} = {alteracao} WHERE codigo_produto = {codigoProduto}")
 
     else:
         alteracao = nonnegative_validacao_numeros(str(input("DIGITE O NOVO VALOR DO CAMPO ESCOLHIDO: ")))
@@ -267,7 +267,11 @@ def descriptografar(descricao_criptografada):
     return descricao_letras_descriptografado
 
 def validacao_codigo():
-    codigoProduto = int(input("Digite o código do produto: "))
+    codigoProduto = str(input("Digite o código do produto: "))
+    if not codigoProduto.isdigit() or codigoProduto == "":
+        print("DADOS INVÁLIDOS INSERIDOS, DIGITE APENAS NÚMEROS!\n")
+        return validacao_codigo()
+    codigoProduto = int(codigoProduto)
     cursor.execute("SELECT codigo_produto from produtos_pi")
     for produto in cursor:
         if codigoProduto in produto:
@@ -276,7 +280,11 @@ def validacao_codigo():
     return codigoProduto
 
 def existencia_codigo():
-    codigoProduto = int(input("Digite o código do produto desejado: "))
+    codigoProduto = str(input("Digite o código do produto desejado: "))
+    if not codigoProduto.isdigit() or codigoProduto == "":
+        print("DADOS INVÁLIDOS INSERIDOS, DIGITE APENAS NÚMEROS!\n")
+        return existencia_codigo()
+    codigoProduto = int(codigoProduto)
     cursor.execute("SELECT codigo_produto from produtos_pi")
     for produto in cursor:
         if codigoProduto in produto:
@@ -327,9 +335,13 @@ def calculo_produtos(produtos_desejados):
 def validacao_descricao(descricao: str):
     descricao = descricao.lower()
     letras = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
+    if descricao == "":
+        print("DADOS INVÁLIDOS!\n")
+        nova_descricao = str(input("Digite a descrição do produto: "))
+        return validacao_descricao(nova_descricao)
     for letra in descricao:
         if letra not in letras:
-            print("CARACTERE INVALIDO NA DESCRIÇÃO DO PRODUTO!")
+            print("CARACTERE INVALIDO NA DESCRIÇÃO DO PRODUTO!\n")
             nova_descricao = str(input("Digite a descrição do produto: "))
             return validacao_descricao(nova_descricao)
     return descricao
@@ -340,29 +352,36 @@ def validacao_numeros(numero: str):
     if numero[0] == "-":
         fator_multiplicativo = -1
         numero = numero[1:]
-    if numero.count(".") > 1:
-        print("DADOS DIGITADOS INVALIDOS")
+    if numero.count(".") > 1 or numero == "":
+        print("DADOS DIGITADOS INVALIDOS!\n")
         novo_valor = str(input("Digite o valor novamente: "))
         return validacao_numeros(novo_valor)
     for algaritimo in numero:
         if algaritimo not in validos:
-            print("DADOS DIGITADOS INVALIDOS")
+            print("DADOS DIGITADOS INVALIDOS!\n")
             novo_valor = str(input("Digite o valor novamente: "))
             return validacao_numeros(novo_valor)
     return float(numero)*fator_multiplicativo
 
 def nonnegative_validacao_numeros(numero: str):
     validos = [".", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0",]
-    if numero.count(".") > 1:
-        print("DADOS DIGITADOS INVALIDOS")
+    if numero.count(".") > 1 or numero == "":
+        print("DADOS DIGITADOS INVALIDOS!\n")
         novo_valor = str(input("Digite o valor novamente: "))
         return nonnegative_validacao_numeros(novo_valor)
     for algaritimo in numero:
         if algaritimo not in validos:
-            print("DADOS DIGITADOS INVALIDOS")
+            print("DADOS DIGITADOS INVALIDOS!\n")
             novo_valor = str(input("Digite o valor novamente: "))
             return nonnegative_validacao_numeros(novo_valor)
     return float(numero)
+
+def validacao_nao_nulo(nome: str):
+    if nome == "":
+        print("DADOS DIGITADOS INVÁLIDOS!\n")
+        novo_nome = str(input("Digite o nome do produto: "))
+        return validacao_nao_nulo(novo_nome)
+    return nome
 
 def main():
     escolha = menu()
