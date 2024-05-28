@@ -199,8 +199,6 @@ def descriptografar(descricao_criptografada):
     descricao_letras_descriptografado = ""
     primeira_linha_matriz = [11, 13]
     segunda_linha_matriz = [2, 3]
-    primeira_linha_matriz = [11, 13]
-    segunda_linha_matriz = [2, 3]
 
     """
         faz a matriz inversa e calcula o determinante e o inverso modular
