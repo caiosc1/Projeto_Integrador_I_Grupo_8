@@ -1,18 +1,5 @@
-#TODO modularizar as contas, fazer validação na inserção do código (não pode ser igual a algum existente) e da descrição (possuir apenas letras validas)
-
 import oracledb
 import getpass
-senha = getpass.getpass("DIGITE A SENHA DO ADMIN DO BANCO DE DADOS: ")
-
-connection = oracledb.connect(
-    user = "BD15022426",
-    password = senha,
-    dsn = "172.16.12.14/xe"
-)
-
-cursor = connection.cursor()
-
-print("\nC o n e c t a d o   a o   B a n c o    c o m    S u c e s s o\n")
 
 def menu():
 
@@ -404,7 +391,19 @@ def main():
         escolha = menu()
     
     print("SAINDO DO PROGRAMA...")
+senha = getpass.getpass("DIGITE A SENHA DO ADMIN DO BANCO DE DADOS: ")
+
+connection = oracledb.connect(
+    user = "BD15022426",
+    password = senha,
+    dsn = "172.16.12.14/xe"
+)
+
+cursor = connection.cursor()
+
+print("\nC o n e c t a d o   a o   B a n c o    c o m    S u c e s s o\n")
 
 main()
+
 cursor.close()
 connection.close()
