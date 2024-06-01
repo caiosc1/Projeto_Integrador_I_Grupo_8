@@ -1,0 +1,420 @@
+import oracledb
+import getpass
+
+def menu():
+
+    print("""
+==========================================================================
+||                                                                      ||
+||      S I S T E M A   D E   C O N T R O L E   D E   E S T O Q U E     ||
+||                                                                      ||
+==========================================================================
+||                                                                      ||
+||                                  M E N U                             ||
+||                                                                      ||
+==========================================================================
+|| 1. Inserir  |  2. Alterar  |  3. Excluir  |  4. Listar  |  5. Sair   ||
+==========================================================================
+    """)
+
+    escolha_menu = str(input("\n\nDIGITE A OPÇÃO DESEJADA(NÚMERO): "))
+    
+    return escolha_menu
+
+
+def menu_insercao():
+    print("""
+==========================================================================
+||                   I N S E R Ç Ã O   D E   D A D O S                  ||
+==========================================================================
+    """)
+
+    codigoProduto = validacao_codigo()
+    nomeProduto = validacao_nao_nulo(str(input("Digite o nome do produto: ")))
+    descricaoProduto = validacao_descricao(str(input("Digite a descrição do produto: ")))
+    custoProduto = nonnegative_validacao_numeros(str(input("Digite o custo do produto(R$): ")))
+    impostos = nonnegative_validacao_numeros(str(input("Digite os impostos do produto(%): ")))
+    custoFixo = nonnegative_validacao_numeros(str(input("Digite o custo fixo do produto(%): ")))
+    comissaoVenda = nonnegative_validacao_numeros(str(input("Digite a comissão de venda do produto(%): ")))
+    rentabilidade = validacao_numeros(str(input("Digite a rentabilidade do produto(%): ")))
+
+    while (impostos+custoFixo+comissaoVenda+rentabilidade)>=100:
+        print("\nVALORES DO PRODUTO ULTRAPASSAM O LIMITE, POR FAVOR REINSIRA OS CAMPOS: ")
+        impostos = nonnegative_validacao_numeros(str(input("Digite os impostos do produto(%): ")))
+        custoFixo = nonnegative_validacao_numeros(str(input("Digite o custo fixo do produto(%): ")))
+        comissaoVenda = nonnegative_validacao_numeros(str(input("Digite a comissão de venda do produto(%): ")))
+        rentabilidade = validacao_numeros(str(input("Digite a rentabilidade do produto(%): ")))
+    
+    descricaoProduto = criptografar(descricaoProduto)
+    cursor.execute(f"INSERT INTO produtos_pi VALUES({codigoProduto}, '{nomeProduto}', '{descricaoProduto}', {custoProduto}, {impostos}, {custoFixo}, {comissaoVenda}, {rentabilidade})")
+    connection.commit()
+
+    input("DADOS DO PRODUTO INSERIDOS COM SUCESSO, APERTE ENTER PARA VOLTAR AO MENU...")
+
+
+def menu_alteracao():
+    print("""
+==========================================================================
+||                A L T E R A Ç Ã O   D E   D A D O S                   ||
+==========================================================================
+    """)
+
+    listaMudancas = {1:"nome" ,2: "descriçao",3: "custo_produto", 4: "custo_fixo",5: "comissao_vendas",6: "impostos",7: "rentabilidade"}
+    valsstring = [1, 2, 7]
+    codigoProduto = existencia_codigo()
+    cursor.execute(f"SELECT * FROM produtos_pi WHERE codigo_produto = {codigoProduto}")
+    produto_excluido = cursor
+
+    for produto in produto_excluido:
+        #             Nome, descrição, custo,custo fixo, comissão, impostos, rentabilidade
+        infProd = [produto[1],produto[2],produto[3],produto[5],produto[6],produto[4],produto[7]]
+        #Tela de apresentação dos resultados
+        print(f"""
+--------------------------------------------------------
+\t1. Nome: {produto[1]}
+\t2. Descrição: {descriptografar(produto[2])}
+\t3. Custo de Aquisição: {produto[3]}
+\t4. Custo Fixo/Administrativo: {produto[5]}
+\t5. Comissão de Vendas: {produto[6]}")
+\t6. Impostos: {produto[4]}")
+\t7. Rentabilidade: {produto[7]}")
+--------------------------------------------------------
+        """)
+
+    escolhaAlteracao = str(input("DIGITE O NÚMERO DO CAMPO QUE DESEJA ALTERAR: "))
+    escolhas_validas = ["1", "2", "3", "4", "5", "6", "7"]
+    while not escolhaAlteracao in escolhas_validas or not escolhaAlteracao.isdigit():
+        print("ESCOLHA INVALIDA!")
+        escolhaAlteracao = str(input("DIGITE O NÚMERO DO CAMPO QUE DESEJA ALTERAR: "))
+    escolhaAlteracao = int(escolhaAlteracao)
+
+    if escolhaAlteracao in valsstring:
+        alteracao = validacao_nao_nulo(str(input("DIGITE O NOVO VALOR DO CAMPO ESCOLHIDO: ")))
+        if escolhaAlteracao == 2:
+            alteracao = validacao_descricao(alteracao)
+            alteracao = criptografar(alteracao)
+            cursor.execute(f"UPDATE produtos_pi set {listaMudancas[escolhaAlteracao]} = '{alteracao}' WHERE codigo_produto = {codigoProduto}")
+
+        if escolhaAlteracao == 7:
+            alteracao = validacao_numeros(alteracao)
+            infProd[escolhaAlteracao-1] = alteracao
+
+            while (infProd[3]+infProd[4]+infProd[5]+infProd[6])>=100:
+                print("\nVALORES DO PRODUTO ULTRAPASSAM O LIMITE, POR FAVOR REINSIRA O CAMPO: ")
+                alteracao = validacao_numeros(str(input("DIGITE O NOVO VALOR DO CAMPO ESCOLHIDO: ")))
+                infProd[escolhaAlteracao-1] = alteracao
+
+            cursor.execute(f"UPDATE produtos_pi set {listaMudancas[escolhaAlteracao]} = {alteracao} WHERE codigo_produto = {codigoProduto}")
+
+    else:
+        alteracao = nonnegative_validacao_numeros(str(input("DIGITE O NOVO VALOR DO CAMPO ESCOLHIDO: ")))
+        infProd[escolhaAlteracao-1] = alteracao
+
+        while (infProd[3]+infProd[4]+infProd[5]+infProd[6])>=100:
+            print("\nVALORES DO PRODUTO ULTRAPASSAM O LIMITE, POR FAVOR REINSIRA O CAMPO: ")
+            alteracao = nonnegative_validacao_numeros(str(input("DIGITE O NOVO VALOR DO CAMPO ESCOLHIDO: ")))
+            infProd[escolhaAlteracao-1] = alteracao
+
+        cursor.execute(f"UPDATE produtos_pi set {listaMudancas[escolhaAlteracao]} = {alteracao} WHERE codigo_produto = {codigoProduto}")
+
+    connection.commit()
+    input("PRODUTO ALTERADO COM SUCESSO, APERTE ENTER PARA CONTINUAR...")
+
+
+def menu_exclusao():
+    print("""
+==========================================================================
+||                   E X C L U S Ã O   D E   D A D O S                  ||
+==========================================================================
+    """)
+
+    codigoProduto = existencia_codigo()
+    cursor.execute(f"SELECT * FROM produtos_pi WHERE codigo_produto = {codigoProduto}")
+    produto_excluido = cursor
+
+    calculo_produtos(produto_excluido)
+
+    escolha_exclusao = str(input("DESEJA REALMENTE EXCLUIR O PRODUTO(S/N): "))
+
+    if escolha_exclusao.upper() == "S":
+        cursor.execute(f"DELETE produtos_pi WHERE codigo_produto = {codigoProduto}")
+        connection.commit()
+        input("PRODUTO EXCLUIDO COM SUCESSO, APERTE ENTER PARA CONTINUAR...")
+
+    else: 
+        input("EXCLUSÃO CANCELADA, APERTE ENTER PARA CONTINUAR...")
+
+
+def listagem():
+    print("""
+==========================================================================
+||                 L I S T A G E M   D E  P R O D U T O S               ||
+==========================================================================
+    """)
+    cursor.execute("SELECT * FROM produtos_pi ORDER BY codigo_produto ASC")
+    #produtos = cursor.fetchall()
+    produtos_listagem = cursor
+
+    calculo_produtos(produtos_listagem)
+
+    input("\nAPERTE ENTER PARA CONTINUAR...")
+
+
+def criptografar(descricao):
+    letras = {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6, "g": 7, "h": 8, "i": 9, "j": 10, "k": 11, "l": 12, "m": 13, "n": 14, "o": 15, "p": 16, "q": 17, "r": 18, "s": 19, "t": 20, "u": 21, "v": 22, "w": 23, "x": 24, "y": 25, "z": 0}
+    numeros = {1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "f", 7: "g", 8: "h", 9: "i", 10: "j", 11: "k", 12: "l", 13: "m", 14: "n", 15: "o", 16: "p", 17: "q", 18: "r", 19: "s", 20: "t", 21: "u", 22: "v", 23: "w", 24: "x", 25: "y", 0: "z"}
+    descricao_letras = descricao
+    descricao_em_numeros = []
+    descricao_numeros_criptografada = []
+    descricao_letras_criptografado = ""
+    primeira_linha_matriz = [11, 13]
+    segunda_linha_matriz = [2, 3]
+
+    """
+        Transforma a palavra em numeros
+    """
+
+    for i in range(len(descricao_letras)):
+        descricao_em_numeros.append(letras.get(descricao_letras[i]))
+
+    """
+        Faz a criptografia
+    """
+
+    while len(descricao_em_numeros) > 0:
+        if len(descricao_em_numeros) >= 2:
+            numero_criptografado = (primeira_linha_matriz[0] * descricao_em_numeros[0] + primeira_linha_matriz[1] * descricao_em_numeros[1]) % 26
+            descricao_numeros_criptografada.append(numero_criptografado)
+            numero_criptografado = (segunda_linha_matriz[0] * descricao_em_numeros[0] + segunda_linha_matriz[1] * descricao_em_numeros[1]) % 26
+            descricao_numeros_criptografada.append(numero_criptografado)
+        else:
+            numero_criptografado = descricao_em_numeros[0]
+            descricao_numeros_criptografada.append(numero_criptografado)
+
+        descricao_em_numeros = descricao_em_numeros[2:]
+
+    """
+        Transforma a palavra criptografa em letras
+    """
+
+    for i in range(len(descricao_numeros_criptografada)):
+        descricao_letras_criptografado += numeros.get(descricao_numeros_criptografada[i])
+
+    return descricao_letras_criptografado
+
+def descriptografar(descricao_criptografada):
+    letras = {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6, "g": 7, "h": 8, "i": 9, "j": 10, "k": 11, "l": 12, "m": 13, "n": 14, "o": 15, "p": 16, "q": 17, "r": 18, "s": 19, "t": 20, "u": 21, "v": 22, "w": 23, "x": 24, "y": 25, "z": 0}
+    numeros = {1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "f", 7: "g", 8: "h", 9: "i", 10: "j", 11: "k", 12: "l", 13: "m", 14: "n", 15: "o", 16: "p", 17: "q", 18: "r", 19: "s", 20: "t", 21: "u", 22: "v", 23: "w", 24: "x", 25: "y", 0: "z"}
+    descricao_letras = descricao_criptografada
+    descricao_em_numeros = []
+    descricao_numeros_descriptografado = []
+    descricao_letras_descriptografado = ""
+    primeira_linha_matriz = [11, 13]
+    segunda_linha_matriz = [2, 3]
+
+    """
+        faz a matriz inversa e calcula o determinante e o inverso modular
+    """
+    primeira_linha_matriz_inversa = [segunda_linha_matriz[1], -primeira_linha_matriz[1]]
+    segunda_linha_matriz_inversa = [-segunda_linha_matriz[0], primeira_linha_matriz[0]]
+
+    determinante = primeira_linha_matriz[0] * segunda_linha_matriz[1] - primeira_linha_matriz[1] * segunda_linha_matriz [0]
+    inverso_modular = 1
+
+    while ((determinante * inverso_modular) % 26) != 1:
+        inverso_modular += 1
+    #print(determinante)
+    #print(inverso_modular)
+
+    """
+        calcula a chave
+    """
+    chave_primeira_linha = [(inverso_modular*primeira_linha_matriz_inversa[0]) % 26, (inverso_modular*primeira_linha_matriz_inversa[1]) % 26]
+    chave_segunda_linha = [(inverso_modular*segunda_linha_matriz_inversa[0]) % 26, (inverso_modular*segunda_linha_matriz_inversa[1]) % 26]
+
+    """
+        Transforma a palavra em numeros
+    """
+
+    for i in range(len(descricao_letras)):
+        descricao_em_numeros.append(letras.get(descricao_letras[i]))
+
+    """
+        pega a palavra criptografada em numeros e descriptografa
+    """
+
+    while len(descricao_em_numeros) > 0:
+        if len(descricao_em_numeros) >= 2:
+            numero_descriptografado = (chave_primeira_linha[0] * descricao_em_numeros[0] + chave_primeira_linha[1] * descricao_em_numeros[1]) % 26
+            descricao_numeros_descriptografado.append(numero_descriptografado)
+            numero_descriptografado = (chave_segunda_linha[0] * descricao_em_numeros[0] + chave_segunda_linha[1] * descricao_em_numeros[1]) % 26
+            descricao_numeros_descriptografado.append(numero_descriptografado)
+        else:
+            numero_descriptografado = descricao_em_numeros[0]
+            descricao_numeros_descriptografado.append(numero_descriptografado)
+        descricao_em_numeros = descricao_em_numeros[2:]
+
+    """
+        transforma a palavra descriptografada em letras
+    """
+
+    for i in range(len(descricao_numeros_descriptografado)):
+        descricao_letras_descriptografado += numeros.get(descricao_numeros_descriptografado[i])
+    
+    return descricao_letras_descriptografado
+
+def validacao_codigo():
+    codigoProduto = str(input("Digite o código do produto: "))
+    if not codigoProduto.isdigit() or codigoProduto == "":
+        print("DADOS INVÁLIDOS INSERIDOS, DIGITE APENAS NÚMEROS!\n")
+        return validacao_codigo()
+    codigoProduto = int(codigoProduto)
+    cursor.execute("SELECT codigo_produto from produtos_pi")
+    for produto in cursor:
+        if codigoProduto in produto:
+            print("CÓDIGO DE PRODUTO JÁ UTILIZADO!\n")
+            return validacao_codigo()
+    return codigoProduto
+
+def existencia_codigo():
+    codigoProduto = str(input("Digite o código do produto desejado: "))
+    if not codigoProduto.isdigit() or codigoProduto == "":
+        print("DADOS INVÁLIDOS INSERIDOS, DIGITE APENAS NÚMEROS!\n")
+        return existencia_codigo()
+    codigoProduto = int(codigoProduto)
+    cursor.execute("SELECT codigo_produto from produtos_pi")
+    for produto in cursor:
+        if codigoProduto in produto:
+            return codigoProduto
+    print("CODIGO DE PRODUTO INEXISTENTE!\n")
+    return existencia_codigo()
+
+def calculo_produtos(produtos_desejados):
+    for produto in produtos_desejados:
+        codigoProduto = produto[0]
+        nomeProduto = produto[1]
+        descricaoProduto = descriptografar(produto[2])
+        custoProduto = produto[3]
+        impostos = produto[4]
+        custoFixo = produto[5]
+        comissaoVenda = produto[6]
+        rentabilidade = produto[7]
+        #Cálculo do Preço de Venda
+        precoVenda = custoProduto/(1-(custoFixo+comissaoVenda+impostos+rentabilidade)/100)
+        #Tela de apresentação dos resultados
+        print(f"""--------------------------------------------------------
+Código: {codigoProduto:<10}{"Nome: "+nomeProduto:>37} \n\nDescrição: {descricaoProduto}
+--------------------------------------------------------
+{"Descrição":35} Valor \t %
+--------------------------------------------------------
+{"A. Preço de Venda":35} {precoVenda:.2f} \t 100%
+{"B. Custo de Aquisição(Fornecedor)":35} {custoProduto:.2f} \t {custoProduto*100/precoVenda:.2f}%
+{"C. Receita Bruta (A-B)":35} {(precoVenda-custoProduto):.2f} \t {(precoVenda-custoProduto)*100/precoVenda:.2f}%
+{"D. Custo Fixo/Administrativo":35} {custoFixo/100 * precoVenda:.2f} \t {custoFixo:.2f}%
+{"E. Comissão de Vendas":35} {comissaoVenda/100 * precoVenda:.2f} \t {comissaoVenda:.2f}%
+{"F. Impostos":35} {impostos/100 * precoVenda:.2f} \t {impostos:.2f}%
+{"G. Outros custos(D+E+F)":35} {custoFixo/100 * precoVenda + comissaoVenda/100 * precoVenda + impostos/100 * precoVenda:.2f} \t {custoFixo+comissaoVenda+impostos:.2f}%
+{"H. Rentabilidade":35} {rentabilidade/100 * precoVenda:.2f} \t {rentabilidade:.2f}%
+--------------------------------------------------------
+        """)
+        if  rentabilidade > 20:
+            print("Lucro: Alto")
+        elif    rentabilidade > 10:
+            print("Lucro: Médio")
+        elif    rentabilidade > 0:
+            print("Lucro: Baixo")
+        elif    rentabilidade == 0:
+            print("Equilíbrio")
+        elif    rentabilidade < 0:
+            print("Prejuízo")
+
+        print("--------------------------------------------------------\n\n\n")
+
+def validacao_descricao(descricao: str):
+    descricao = descricao.lower()
+    letras = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
+    if descricao == "":
+        print("DADOS INVÁLIDOS!\n")
+        nova_descricao = str(input("Digite a descrição do produto: "))
+        return validacao_descricao(nova_descricao)
+    for letra in descricao:
+        if letra not in letras:
+            print("CARACTERE INVALIDO NA DESCRIÇÃO DO PRODUTO!\n")
+            nova_descricao = str(input("Digite a descrição do produto: "))
+            return validacao_descricao(nova_descricao)
+    return descricao
+
+def validacao_numeros(numero: str):
+    validos = [".", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0",]
+    fator_multiplicativo = 1
+    if numero[0] == "-":
+        fator_multiplicativo = -1
+        numero = numero[1:]
+    if numero.count(".") > 1 or numero == "":
+        print("DADOS DIGITADOS INVALIDOS!\n")
+        novo_valor = str(input("Digite o valor novamente: "))
+        return validacao_numeros(novo_valor)
+    for algaritimo in numero:
+        if algaritimo not in validos:
+            print("DADOS DIGITADOS INVALIDOS!\n")
+            novo_valor = str(input("Digite o valor novamente: "))
+            return validacao_numeros(novo_valor)
+    return float(numero)*fator_multiplicativo
+
+def nonnegative_validacao_numeros(numero: str):
+    validos = [".", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0",]
+    if numero.count(".") > 1 or numero == "":
+        print("DADOS DIGITADOS INVALIDOS!\n")
+        novo_valor = str(input("Digite o valor novamente: "))
+        return nonnegative_validacao_numeros(novo_valor)
+    for algaritimo in numero:
+        if algaritimo not in validos:
+            print("DADOS DIGITADOS INVALIDOS!\n")
+            novo_valor = str(input("Digite o valor novamente: "))
+            return nonnegative_validacao_numeros(novo_valor)
+    return float(numero)
+
+def validacao_nao_nulo(nome: str):
+    if nome == "":
+        print("DADOS DIGITADOS INVÁLIDOS!\n")
+        novo_nome = str(input("Digite o nome do produto: "))
+        return validacao_nao_nulo(novo_nome)
+    return nome
+
+def main():
+    escolha = menu()
+
+    while escolha != "5":
+        if escolha == "1":
+            menu_insercao()
+
+        elif escolha == "2":
+            menu_alteracao()
+
+        elif escolha == "3":
+            menu_exclusao()
+
+        elif escolha == "4":
+            listagem()
+        else:
+            input("ESCOLHA INVALIDA, APERTE ENTER PARA CONTINUAR...")
+
+        escolha = menu()
+    
+    print("SAINDO DO PROGRAMA...")
+senha = getpass.getpass("DIGITE A SENHA DO ADMIN DO BANCO DE DADOS: ")
+
+connection = oracledb.connect(
+    user = "BD15022426",
+    password = senha,
+    dsn = "172.16.12.14/xe"
+)
+
+cursor = connection.cursor()
+
+print("\n\tC o n e c t a d o   a o   B a n c o    c o m    S u c e s s o\n")
+
+main()
+
+cursor.close()
+connection.close()
